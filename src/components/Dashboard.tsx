@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Calendar, Clock, Bell, TrendingUp, Award, BookOpen, Users, Briefcase, Star } from 'lucide-react';
 import { NavigationHeader, QuickActions } from './NavigationHeader';
 import type { UserProfile } from '../types';
@@ -30,12 +30,7 @@ export function Dashboard({ userProfile, onNavigate }: DashboardProps) {
     return () => clearInterval(timer);
   }, []);
 
-  useEffect(() => {
-    // Generate today's schedule based on user profile
-    generateDailySchedule();
-  }, [userProfile]);
-
-  const generateDailySchedule = () => {
+  const generateDailySchedule = useCallback(() => {
     const today = new Date().getDay(); // 0 = Sunday, 1 = Monday, etc.
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const todayName = daysOfWeek[today];
@@ -64,11 +59,16 @@ export function Dashboard({ userProfile, onNavigate }: DashboardProps) {
     // Sort by time
     schedule.sort((a, b) => a.time.localeCompare(b.time));
     setTodaySchedule(schedule);
-  };
+  }, [userProfile]);
+
+  useEffect(() => {
+    // Generate today's schedule based on user profile
+    generateDailySchedule();
+  }, [userProfile, generateDailySchedule]);
 
   const getCurrentActivity = () => {
     const now = currentTime.toTimeString().slice(0, 5);
-    const currentItem = todaySchedule.find(item => item.time <= now);
+    const currentItem = todaySchedule.find((item: ScheduleItem) => item.time <= now);
     return currentItem || { activity: 'Free Time', type: 'break' };
   };
 

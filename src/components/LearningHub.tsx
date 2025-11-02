@@ -9,6 +9,22 @@ interface LearningHubProps {
   userName?: string;
 }
 
+interface YouTubeVideoItem {
+  id: {
+    videoId: string;
+  };
+  snippet: {
+    title: string;
+    channelTitle: string;
+    publishedAt: string;
+    thumbnails: {
+      medium: {
+        url: string;
+      };
+    };
+  };
+}
+
 interface VideoTutorial {
   id: string;
   title: string;
@@ -88,7 +104,7 @@ export function LearningHub({ currentView, onNavigate, onLogout, userName }: Lea
 
       const data = await response.json();
 
-      const videoData: VideoTutorial[] = data.items.map((item: any) => ({
+      const videoData: VideoTutorial[] = data.items.map((item: YouTubeVideoItem) => ({
         id: item.id.videoId,
         title: item.snippet.title,
         channelTitle: item.snippet.channelTitle,
@@ -138,7 +154,7 @@ export function LearningHub({ currentView, onNavigate, onLogout, userName }: Lea
 
       const data = await response.json();
 
-      const videoData: VideoTutorial[] = data.items.map((item: any) => ({
+      const videoData: VideoTutorial[] = data.items.map((item: YouTubeVideoItem) => ({
         id: item.id.videoId,
         title: item.snippet.title,
         channelTitle: item.snippet.channelTitle,

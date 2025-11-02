@@ -1,6 +1,15 @@
 import { codeExamples } from './codeExamples';
 import type { UserProfile } from '../../types';
 
+interface YouTubeVideoItem {
+  id: {
+    videoId: string;
+  };
+  snippet: {
+    title: string;
+  };
+}
+
 // Google API Configuration
 const GOOGLE_API_KEY = 'AIzaSyB2tCiwdr83papZ3AG4W_WVGIaN989rMSo';
 const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
@@ -80,7 +89,11 @@ export async function generateResponse(input: string, userProfile: UserProfile |
           const skill = skills[index];
           response += `📚 **${skill} Tutorials:**\n`;
           videos.slice(0, 2).forEach(video => {
-            response += `• ${video.title}\n  👁️ ${video.viewCount} views | ⏱️ ${video.duration}\n  🔗 ${video.url}\n\n`;
+            response += `• ${video.title}
+  👁️ ${video.viewCount} views | ⏱️ ${video.duration}
+  🔗 ${video.url}
+
+`;
           });
         });
 
@@ -155,7 +168,7 @@ async function searchYouTubeVideos(skill: string): Promise<Array<{title: string,
 
     const data = await response.json();
 
-    return data.items.map((item: any) => ({
+    return data.items.map((item: YouTubeVideoItem) => ({
       title: item.snippet.title,
       url: `https://www.youtube.com/watch?v=${item.id.videoId}`,
       viewCount: 'N/A', // Would need additional API call for view count
@@ -182,7 +195,11 @@ async function queryGeminiAI(input: string, userProfile: UserProfile | null): Pr
       body: JSON.stringify({
         contents: [{
           parts: [{
-            text: `${context}\n\nUser question: ${input}\n\nProvide a helpful, educational response. Keep it concise but informative.`
+            text: `${context}
+
+User question: ${input}
+
+Provide a helpful, educational response. Keep it concise but informative.`
           }]
         }]
       })

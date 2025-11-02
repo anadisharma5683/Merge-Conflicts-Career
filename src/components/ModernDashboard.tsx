@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   Calendar, 
   Clock, 
@@ -42,16 +42,7 @@ export function ModernDashboard({ userProfile, onNavigate }: ModernDashboardProp
   const [currentTime, setCurrentTime] = useState(new Date());
   const [todaySchedule, setTodaySchedule] = useState<ScheduleItem[]>([]);
 
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    generateDailySchedule();
-  }, [userProfile]);
-
-  const generateDailySchedule = () => {
+  const generateDailySchedule = useCallback(() => {
     const today = new Date().getDay();
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const todayName = daysOfWeek[today];
@@ -77,7 +68,16 @@ export function ModernDashboard({ userProfile, onNavigate }: ModernDashboardProp
 
     schedule.sort((a, b) => a.time.localeCompare(b.time));
     setTodaySchedule(schedule);
-  };
+  }, [userProfile]);
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    generateDailySchedule();
+  }, [userProfile, generateDailySchedule]);
 
   const careerMilestones: CareerMilestone[] = [
     {
